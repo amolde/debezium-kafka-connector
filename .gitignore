@@ -309,3 +309,6 @@ tags
 
 # End of https://www.gitignore.io/api/java,vim,emacs,visualstudiocode,eclipse,intellij
 .flattened-pom.xml
+
+oracle-instantclient
+debezium-connector-oracle

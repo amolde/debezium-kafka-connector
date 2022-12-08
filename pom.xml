@@ -21,7 +21,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.northeastern.eventsplatform</groupId>
   <artifactId>debezium-kafka-connector</artifactId>
-  <version>0.0.1</version>
+  <version>2.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Debezium-Kafka-Connector :: custom</name>
   <description>Custom Debezium Kafka Connector</description>
@@ -36,7 +36,8 @@
     <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
     <maven-checksum-maven-plugin.version>1.7</maven-checksum-maven-plugin.version>
     <version.maven.jar>3.1.0</version.maven.jar>
-    <confluent.version>6.1.1</confluent.version>
+    <version.maven>3.8.4</version.maven>
+    <confluent.version>7.3.0</confluent.version>
     <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
   </properties>
 
