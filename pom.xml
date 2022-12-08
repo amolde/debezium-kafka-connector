@@ -38,7 +38,7 @@
     <version.maven.jar>3.1.0</version.maven.jar>
     <version.maven>3.8.4</version.maven>
     <confluent.version>7.3.0</confluent.version>
-    <confluent.maven.repo>http://packages.confluent.io/maven/</confluent.maven.repo>
+    <confluent.maven.repo>https://packages.confluent.io/maven/</confluent.maven.repo>
   </properties>
 
   <dependencies>

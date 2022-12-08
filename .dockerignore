@@ -9,5 +9,3 @@ tooling
 tests
 buildingtools
 
-debezium-connector-oracle
-oracle-instantclient
