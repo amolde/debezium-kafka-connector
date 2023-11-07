@@ -24,36 +24,41 @@
 instantclientdir=oracle-instantclient
 
 mkdir "${instantclientdir}"
-curl -L 'https://download.oracle.com/otn_software/linux/instantclient/218000/instantclient-basic-linux.x64-21.8.0.0.0dbru.zip' --output "${instantclientdir}/instantclient-basic-linux.x64-21.8.0.0.0dbru.zip"
+curl -L 'https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip' --output "${instantclientdir}/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip"
 cd "${instantclientdir}"
-unzip "instantclient-basic-linux.x64-21.8.0.0.0dbru.zip"
+unzip "instantclient-basic-linux.x64-21.12.0.0.0dbru.zip"
 cd ..
 
 mvn install:install-file \
   -DgroupId=com.oracle.instantclient \
   -DartifactId=xstreams \
-  -Dversion=21.6.0.0 \
+  -Dversion=21.12.0.0 \
   -Dpackaging=jar \
-  -Dfile=${instantclientdir}/instantclient_21_8/xstreams.jar
+  -Dfile=${instantclientdir}/instantclient_21_12/xstreams.jar
 
 
 # Go where https://github.com/amolde/debezium is cloned
 cd ../debezium
 
 git checkout 2.0
+git fetch upstream
+git pull upstream main
+git checkout tags/v2.4.0.Final     
 
-mvn clean install -pl debezium-connector-oracle -am -Passembly         
 
-ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-2.0.0-SNAPSHOT-plugin.tar.gz  
+#mvn clean verify -Dquick
+mvn clean install -pl debezium-connector-oracle -am -Passembly -Dquick
 
-tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-2.0.0-SNAPSHOT-plugin.tar.gz  
+ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-plugin.tar.gz
+
+tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-plugin.tar.gz
 
 # =========================================================
 
 # Change back to this project
 cd -
 
-docker_tag=2.0.0-SNAPSHOT
+docker_tag=2.4.0.FINAL
 
 if [[ ${docker_tag} == "" ]]
 then
@@ -67,17 +72,17 @@ fi
 connectorplugindir=debezium-connector-oracle
 
 mkdir "${connectorplugindir}"
-cp ../debezium/debezium-connector-oracle/target/debezium-connector-oracle-2.0.0-SNAPSHOT-plugin.tar.gz ./${connectorplugindir}/debezium-connector-oracle.tar.gz
+cp ../debezium/debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-plugin.tar.gz ./${connectorplugindir}/debezium-connector-oracle.tar.gz
 
 cd "${connectorplugindir}"
 tar xvf debezium-connector-oracle.tar.gz
 cd -
 
-ls -lrt "${instantclientdir}/instantclient_21_8/ojdbc8.jar"
+ls -lrt "${instantclientdir}/instantclient_21_12/ojdbc11.jar"
 
 mvn clean install
 
-ls -lrt ./target/debezium-kafka-connector-2.0.0-SNAPSHOT-package/share/java/
+ls -lrt ./target/debezium-kafka-connector-2.4.0.FINAL-package/share/java/
 
 docker build -t amolde/debezium-kafka-connect:${docker_tag} .
 
