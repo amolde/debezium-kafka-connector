@@ -58,7 +58,8 @@ tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-
 # Change back to this project
 cd -
 
-docker_tag=2.4.0.FINAL
+docker_tag=2.4.0.FINAL-OTEL
+DEBEZIUM_CONNECTOR_VERSION=2.4.0.Final
 
 if [[ ${docker_tag} == "" ]]
 then
@@ -72,11 +73,13 @@ fi
 connectorplugindir=debezium-connector-oracle
 
 mkdir "${connectorplugindir}"
-cp ../debezium/debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-plugin.tar.gz ./${connectorplugindir}/debezium-connector-oracle.tar.gz
+cp ../debezium/debezium-connector-oracle/target/debezium-connector-oracle-${DEBEZIUM_CONNECTOR_VERSION}-plugin.tar.gz ./${connectorplugindir}/debezium-connector-oracle.tar.gz
 
 cd "${connectorplugindir}"
 tar xvf debezium-connector-oracle.tar.gz
-cd -
+cd debezium-connector-oracle
+curl -sfSL https://repo1.maven.org/maven2/io/debezium/debezium-interceptor/${DEBEZIUM_CONNECTOR_VERSION}/debezium-interceptor-${DEBEZIUM_CONNECTOR_VERSION}.jar -o debezium-interceptor-${DEBEZIUM_CONNECTOR_VERSION}.jar
+cd ../..
 
 ls -lrt "${instantclientdir}/instantclient_21_12/ojdbc11.jar"
 
