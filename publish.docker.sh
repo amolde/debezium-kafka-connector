@@ -1,50 +1,111 @@
-set -e
+# % mvn -version
+# Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
 
-docker_tag=$1
+# jenv versions
+# brew install openjdk@17
+# /usr/local/opt/openjdk@17/bin/java -version
+# jenv add /usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home 
+# jenv shell 17.0.5
+
+# % java -version
+# openjdk version "17.0.5" 2022-10-18
+# OpenJDK Runtime Environment Homebrew (build 17.0.5+0)
+# OpenJDK 64-Bit Server VM Homebrew (build 17.0.5+0, mixed mode, sharing)
+
+# % git -v
+# git version 2.37.1 (Apple Git-137.1)
+
+
+# % docker -v
+# Docker version 20.10.7, build f0df350
+
+# =========================================================
+
+instantclientdir=oracle-instantclient
+
+mkdir "${instantclientdir}"
+curl -L 'https://download.oracle.com/otn_software/linux/instantclient/2112000/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip' --output "${instantclientdir}/instantclient-basic-linux.x64-21.12.0.0.0dbru.zip"
+cd "${instantclientdir}"
+unzip "instantclient-basic-linux.x64-21.12.0.0.0dbru.zip"
+cd ..
+
+mvn install:install-file \
+  -DgroupId=com.oracle.instantclient \
+  -DartifactId=xstreams \
+  -Dversion=21.12.0.0 \
+  -Dpackaging=jar \
+  -Dfile=${instantclientdir}/instantclient_21_12/xstreams.jar
+
+
+# Go where https://github.com/amolde/debezium is cloned
+cd ../debezium
+
+### Following to be run in /Users/a.deshmukh/work/java/debezium
+# 
+# pwd
+# /Users/a.deshmukh/work/java/debezium
+# 
+# git remote -v
+# origin	git@github.com:amolde/debezium.git (fetch)
+# origin	git@github.com:amolde/debezium.git (push)
+# upstream	https://github.com/debezium/debezium.git (fetch)
+# upstream	https://github.com/debezium/debezium.git (push)
+
+git checkout main
+git fetch upstream
+git pull upstream main
+git pull origin main
+git fetch --tags
+git checkout tags/v2.6.1.Final
+
+
+#mvn clean verify -Dquick
+mvn clean install -pl debezium-connector-oracle -am -Passembly -Dquick
+
+ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-2.6.1.Final-plugin.tar.gz
+
+tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-2.6.1.Final-plugin.tar.gz
+
+# =========================================================
+
+# Change back to this project
+# cd -
+
+docker_tag=2.6.1.Final-OTEL
+DEBEZIUM_CONNECTOR_VERSION=2.6.1.Final
+EDIT_VERSION_IN_POM=2.6.1.Final
+
 if [[ ${docker_tag} == "" ]]
 then
     echo "provide docker tag"
     exit 1
 fi
 
-jenv global
-# 1.8.0.232
-jenv version
-# 1.8.0.232 (set by /Users/adeshmukh/.jenv/version)
-mvn -version
-
-mvn clean package
-
 # curl -L 'https://oss.sonatype.org/service/local/artifact/maven/redirect?r=snapshots&g=io.debezium&a=debezium-connector-oracle&v=LATEST&c=plugin&e=tar.gz' --output debezium-connector-oracle.tar.gz
-# # https://repo1.maven.org/maven2/io/debezium/debezium-connector-oracle/1.6.0.Beta1/debezium-connector-oracle-1.6.0.Beta1.jar
+# https://repo1.maven.org/maven2/io/debezium/debezium-connector-oracle/2.0.0.Alpha2/debezium-connector-oracle-2.0.0.Alpha2.jar
 
-# jenv versions
-# brew install java11
-# /usr/local/opt/openjdk@11/bin/java --version
-# jenv add /usr/local/Cellar/openjdk@11/11.0.9
-# jenv shell 11.0.9
-# cd ../debezium
-# git checkout origin nu_v1.6.0.Snapshot
-# mvn clean install -pl debezium-connector-oracle -am -Poracle,oracle-ci,-xstream-dependency  -DskipITs=true
-cp /Users/adeshmukh/kafka/debezium/debezium-connector-oracle/target/debezium-connector-oracle-1.6.0-SNAPSHOT-plugin.tar.gz ./debezium-connector-oracle.tar.gz
+connectorplugindir=debezium-connector-oracle
 
+mkdir "${connectorplugindir}"
+cp ../debezium/debezium-connector-oracle/target/debezium-connector-oracle-${DEBEZIUM_CONNECTOR_VERSION}-plugin.tar.gz ./${connectorplugindir}/debezium-connector-oracle.tar.gz
+
+cd "${connectorplugindir}"
 tar xvf debezium-connector-oracle.tar.gz
+cd debezium-connector-oracle
+curl -sfSL https://repo1.maven.org/maven2/io/debezium/debezium-interceptor/${DEBEZIUM_CONNECTOR_VERSION}/debezium-interceptor-${DEBEZIUM_CONNECTOR_VERSION}.jar -o debezium-interceptor-${DEBEZIUM_CONNECTOR_VERSION}.jar
+cd ../..
 
-curl 'https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basic-linux.x64-21.1.0.0.0.zip' -o instantclient-basic-linux.x64-21.1.0.0.0.zip
-unzip instantclient-basic-linux.x64-21.1.0.0.0.zip
+ls -lrt "${instantclientdir}/instantclient_21_12/ojdbc11.jar"
 
-ls -lrt instantclient_21_1/ojdbc8.jar 
-ls -lrt ./target/debezium-kafka-connector-0.0.1-package/share/java/
+mvn clean install
 
-# Now building for 0.0.3
+ls -lrt ./target/debezium-kafka-connector-${EDIT_VERSION_IN_POM}-package/share/java/
 
-# docker build -t amolde/strimzi-kafka-connect:${docker_tag} -t amolde/strimzi-kafka-connect:latest .
 docker build -t amolde/debezium-kafka-connect:${docker_tag} .
+
 # docker login
 # docker push amolde/debezium-kafka-connect:${docker_tag}
 
-rm -rf debezium-connector-oracle
-rm -rf instantclient_21_1
-rm debezium-connector-oracle.tar.gz
-rm instantclient-basic-linux.x64-21.1.0.0.0.zip
+# rm -rf "${connectorplugindir}"
+# rm -rf "${instantclientdir}"
 
