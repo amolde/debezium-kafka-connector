@@ -40,26 +40,40 @@ mvn install:install-file \
 # Go where https://github.com/amolde/debezium is cloned
 cd ../debezium
 
-git checkout 2.0
+### Following to be run in /Users/a.deshmukh/work/java/debezium
+# 
+# pwd
+# /Users/a.deshmukh/work/java/debezium
+# 
+# git remote -v
+# origin	git@github.com:amolde/debezium.git (fetch)
+# origin	git@github.com:amolde/debezium.git (push)
+# upstream	https://github.com/debezium/debezium.git (fetch)
+# upstream	https://github.com/debezium/debezium.git (push)
+
+git checkout main
 git fetch upstream
 git pull upstream main
-git checkout tags/v2.4.0.Final     
+git pull origin main
+git fetch --tags
+git checkout tags/v2.6.1.Final
 
 
 #mvn clean verify -Dquick
 mvn clean install -pl debezium-connector-oracle -am -Passembly -Dquick
 
-ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-plugin.tar.gz
+ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-2.6.1.Final-plugin.tar.gz
 
-tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-2.4.0.Final-plugin.tar.gz
+tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-2.6.1.Final-plugin.tar.gz
 
 # =========================================================
 
 # Change back to this project
-cd -
+# cd -
 
-docker_tag=2.4.0.FINAL-OTEL
-DEBEZIUM_CONNECTOR_VERSION=2.4.0.Final
+docker_tag=2.6.1.Final-OTEL
+DEBEZIUM_CONNECTOR_VERSION=2.6.1.Final
+EDIT_VERSION_IN_POM=2.6.1.Final
 
 if [[ ${docker_tag} == "" ]]
 then
@@ -85,7 +99,7 @@ ls -lrt "${instantclientdir}/instantclient_21_12/ojdbc11.jar"
 
 mvn clean install
 
-ls -lrt ./target/debezium-kafka-connector-2.4.0.FINAL-package/share/java/
+ls -lrt ./target/debezium-kafka-connector-${EDIT_VERSION_IN_POM}-package/share/java/
 
 docker build -t amolde/debezium-kafka-connect:${docker_tag} .
 
