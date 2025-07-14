@@ -1,4 +1,4 @@
-FROM quay.io/strimzi/kafka:0.40.0-kafka-3.6.0
+FROM quay.io/strimzi/kafka:0.46.0-kafka-4.0.0
 USER root:root
 RUN mkdir -p /opt/kafka/plugins/debezium
 COPY ./debezium-connector-oracle/debezium-connector-oracle/ /opt/kafka/plugins/debezium/

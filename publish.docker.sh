@@ -55,8 +55,8 @@ cd ../debezium
 
 git checkout main
 git fetch upstream
-git pull upstream main
-git pull origin main
+git pull upstream main --rebase
+git pull origin main --rebase
 git fetch --tags
 git checkout tags/v3.0.0.Final
 
@@ -77,7 +77,7 @@ tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-3.0.0.Final-
 # Change back to this project
 # cd -
 
-docker_tag=3.0.0.Final
+docker_tag=3.0.0.Final-KFKUPGRD
 DEBEZIUM_CONNECTOR_VERSION=3.0.0.Final
 EDIT_VERSION_IN_POM=3.0.0.Final
 
