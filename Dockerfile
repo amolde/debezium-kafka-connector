@@ -5,4 +5,9 @@ COPY ./debezium-connector-oracle/debezium-connector-oracle/ /opt/kafka/plugins/d
 COPY ./target/debezium-kafka-connector-3.0.0.Final-package/share/java/debezium-kafka-connector/ /opt/kafka/plugins/debezium/
 COPY ./oracle-instantclient/instantclient_21_12/ojdbc11.jar /opt/kafka/libs/ojdbc11.jar
 COPY ./oracle-instantclient/instantclient_21_12/ojdbc8.jar /opt/kafka/libs/ojdbc8.jar
+RUN mkdir /opt/kafka/nu-custom-config
+RUN chown 1001:root /opt/kafka/nu-custom-config
+COPY ./kafka_connect_tls_prepare_certificates.sh /opt/kafka/nu-custom-config/kafka_connect_tls_prepare_certificates.sh
+RUN chmod +x /opt/kafka/nu-custom-config/kafka_connect_tls_prepare_certificates.sh
 USER 1001
+ENTRYPOINT ["/bin/bash", "/opt/kafka/nu-custom-config/kafka_connect_tls_prepare_certificates.sh"]
