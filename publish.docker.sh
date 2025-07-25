@@ -58,7 +58,7 @@ git fetch upstream
 git pull upstream main --rebase
 git pull origin main --rebase
 git fetch --tags
-git checkout tags/v3.0.0.Final
+git checkout tags/v3.2.0.Final
 
 brew install java
 sudo ln -sfn /usr/local/opt/openjdk@22/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk@22
@@ -68,18 +68,19 @@ jenv add /Library/Java/JavaVirtualMachines/openjdk.jdk@22/Contents/Home/
 #mvn clean verify -Dquick
 mvn clean install -pl debezium-connector-oracle -am -Passembly -Dquick -Dinstantclient.dir=/Users/a.deshmukh/work/java/debezium-kafka-connector/oracle-instantclient/instantclient_21_15
 
-ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-3.0.0.Final-plugin.tar.gz
+docker_tag=3.2.0.Final
 
-tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-3.0.0.Final-plugin.tar.gz
+ls -lrt debezium-connector-oracle/target/debezium-connector-oracle-${docker_tag}-plugin.tar.gz
+
+tar tvf  debezium-connector-oracle/target/debezium-connector-oracle-${docker_tag}-plugin.tar.gz
 
 # =========================================================
 
 # Change back to this project
 # cd -
 
-docker_tag=3.0.0.Final-KFKUPGRD
-DEBEZIUM_CONNECTOR_VERSION=3.0.0.Final
-EDIT_VERSION_IN_POM=3.0.0.Final
+DEBEZIUM_CONNECTOR_VERSION=${docker_tag}
+EDIT_VERSION_IN_POM=${docker_tag}
 
 if [[ ${docker_tag} == "" ]]
 then
@@ -98,6 +99,7 @@ cp ../debezium/debezium-connector-oracle/target/debezium-connector-oracle-${DEBE
 cd "${connectorplugindir}"
 tar xvf debezium-connector-oracle.tar.gz
 cd debezium-connector-oracle
+rm debezium-interceptor-3.0.0.Final.jar
 curl -sfSL https://repo1.maven.org/maven2/io/debezium/debezium-interceptor/${DEBEZIUM_CONNECTOR_VERSION}/debezium-interceptor-${DEBEZIUM_CONNECTOR_VERSION}.jar -o debezium-interceptor-${DEBEZIUM_CONNECTOR_VERSION}.jar
 cd ../..
 

@@ -2,9 +2,9 @@ FROM quay.io/strimzi/kafka:0.47.0-kafka-4.0.0
 USER root:root
 RUN mkdir -p /opt/kafka/plugins/debezium
 COPY ./debezium-connector-oracle/debezium-connector-oracle/ /opt/kafka/plugins/debezium/
-COPY ./target/debezium-kafka-connector-3.0.0.Final-package/share/java/debezium-kafka-connector/ /opt/kafka/plugins/debezium/
-COPY ./oracle-instantclient/instantclient_21_12/ojdbc11.jar /opt/kafka/libs/ojdbc11.jar
-COPY ./oracle-instantclient/instantclient_21_12/ojdbc8.jar /opt/kafka/libs/ojdbc8.jar
+COPY ./target/debezium-kafka-connector-3.2.0.Final-package/share/java/debezium-kafka-connector/ /opt/kafka/plugins/debezium/
+COPY ./oracle-instantclient/instantclient_21_15/ojdbc11.jar /opt/kafka/libs/ojdbc11.jar
+COPY ./oracle-instantclient/instantclient_21_15/ojdbc8.jar /opt/kafka/libs/ojdbc8.jar
 RUN mkdir /opt/kafka/nu-custom-config
 RUN chown 1001:root /opt/kafka/nu-custom-config
 COPY ./kafka_connect_tls_prepare_certificates.sh /opt/kafka/nu-custom-config/kafka_connect_tls_prepare_certificates.sh
